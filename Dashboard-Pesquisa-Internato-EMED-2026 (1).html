@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Pesquisa Internato EMED 2026 — Dashboard</title>
+<meta name="viewport" content="width=1400">
+<style>
+  :root {
+    --bg: #0b1018;
+    --bg2: #0f1622;
+    --card: #161e2c;
+    --card2: #1b2535;
+    --border: #25304a;
+    --border-strong: #3b4763;
+    --text: #e9edf5;
+    --muted: #8a97b3;
+    --muted2: #6b7892;
+    --accent: #5dd6ff;
+    --warn-bg: #2a1a16;
+    --warn-border: #c0392b;
+    --warn-text: #ff8a73;
+    --good-bg: #122a1d;
+    --good-border: #1e8a55;
+    --good-text: #6fe0a4;
+    --info-bg: #16203a;
+    --info-border: #3b6cc1;
+    --info-text: #8ab8ff;
+
+    --c-red: #ff4d5e;
+    --c-orange: #ff8a3d;
+    --c-amber: #ffb547;
+    --c-yellow: #ffd84d;
+    --c-lime: #b8e347;
+    --c-green: #4dd28c;
+    --c-teal: #2dd4bf;
+    --c-cyan: #38bdf8;
+    --c-blue: #4c8dff;
+    --c-indigo: #7b6cf6;
+    --c-violet: #a855f7;
+    --c-pink: #f06292;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: radial-gradient(1200px 800px at 20% -10%, #182336 0%, var(--bg) 55%) fixed;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "tnum", "ss01";
+  }
+  .wrap { max-width: 1360px; margin: 0 auto; padding: 28px 28px 60px; }
+
+  /* HEADER */
+  .header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; margin-bottom: 22px; flex-wrap: wrap;
+  }
+  .title h1 {
+    margin: 0 0 6px; font-size: 28px; letter-spacing: -0.4px;
+    background: linear-gradient(90deg, #ffffff 0%, #b9d8ff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .title .sub { color: var(--muted); font-size: 13px; }
+  .title .sub b { color: var(--text); font-weight: 600; }
+
+  /* KPI cards */
+  .kpis { display: flex; gap: 12px; flex: 0 0 auto; }
+  .kpi {
+    background: linear-gradient(180deg, var(--card2) 0%, var(--card) 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    min-width: 130px;
+    text-align: left;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 6px 22px rgba(0,0,0,0.35);
+  }
+  .kpi .num { font-size: 32px; font-weight: 700; line-height: 1; letter-spacing: -0.5px; }
+  .kpi .lbl { font-size: 11px; color: var(--muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
+  .kpi.k1 .num { color: #fff; }
+  .kpi.k2 .num { color: var(--c-orange); }
+  .kpi.k3 .num { color: var(--c-red); }
+  .kpi.k4 .num { color: var(--c-cyan); }
+
+  /* GRID */
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+  .card {
+    background: linear-gradient(180deg, var(--card2) 0%, var(--card) 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px 14px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 6px 22px rgba(0,0,0,0.35);
+  }
+  .card h3 {
+    margin: 0 0 12px; font-size: 11px; letter-spacing: 0.9px;
+    text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h3::before {
+    content: ""; width: 6px; height: 6px; border-radius: 999px;
+    background: var(--accent); box-shadow: 0 0 10px var(--accent);
+  }
+  .card .insight {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px dashed var(--border-strong);
+    font-size: 12px; color: var(--muted);
+    line-height: 1.5;
+  }
+  .card .insight b { color: var(--text); font-weight: 600; }
+
+  .col-3 { grid-column: span 3; }
+  .col-4 { grid-column: span 4; }
+  .col-5 { grid-column: span 5; }
+  .col-6 { grid-column: span 6; }
+  .col-7 { grid-column: span 7; }
+  .col-8 { grid-column: span 8; }
+  .col-9 { grid-column: span 9; }
+  .col-12 { grid-column: span 12; }
+
+  /* BARS */
+  .bars { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 170px 1fr 50px; align-items: center; gap: 10px; font-size: 12.5px; }
+  .bar-row .label { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-row .label.small { font-size: 12px; }
+  .bar-row .track {
+    height: 18px; background: rgba(255,255,255,0.04);
+    border-radius: 6px; overflow: hidden; position: relative;
+  }
+  .bar-row .fill {
+    height: 100%; border-radius: 6px;
+    box-shadow: 0 0 14px rgba(255,255,255,0.08) inset;
+    transition: width .3s ease;
+  }
+  .bar-row .pct { font-weight: 600; text-align: right; color: var(--text); font-variant-numeric: tabular-nums; }
+  .bar-row .pct .n { color: var(--muted); font-weight: 400; font-size: 11px; }
+
+  .bar-row.compact { grid-template-columns: 130px 1fr 46px; }
+  .bar-row.tight { grid-template-columns: 200px 1fr 50px; }
+
+  /* Color helpers */
+  .c-red { background: linear-gradient(90deg, #ff4d5e 0%, #ff7a4d 100%); }
+  .c-orange { background: linear-gradient(90deg, #ff8a3d 0%, #ffb547 100%); }
+  .c-amber { background: linear-gradient(90deg, #ffb547 0%, #ffd84d 100%); }
+  .c-yellow { background: linear-gradient(90deg, #ffd84d 0%, #b8e347 100%); }
+  .c-lime { background: linear-gradient(90deg, #b8e347 0%, #4dd28c 100%); }
+  .c-green { background: linear-gradient(90deg, #4dd28c 0%, #2dd4bf 100%); }
+  .c-teal { background: linear-gradient(90deg, #2dd4bf 0%, #38bdf8 100%); }
+  .c-cyan { background: linear-gradient(90deg, #38bdf8 0%, #4c8dff 100%); }
+  .c-blue { background: linear-gradient(90deg, #4c8dff 0%, #7b6cf6 100%); }
+  .c-indigo { background: linear-gradient(90deg, #7b6cf6 0%, #a855f7 100%); }
+  .c-violet { background: linear-gradient(90deg, #a855f7 0%, #f06292 100%); }
+  .c-pink { background: linear-gradient(90deg, #f06292 0%, #ff4d5e 100%); }
+
+  /* Donut */
+  .donut-wrap { display: flex; align-items: center; gap: 16px; }
+  .donut { position: relative; width: 130px; height: 130px; flex: 0 0 auto; }
+  .donut svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .donut .center {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+  }
+  .donut .center .n { font-size: 26px; font-weight: 700; line-height: 1; }
+  .donut .center .l { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .legend { display: flex; flex-direction: column; gap: 8px; flex: 1; font-size: 12.5px; }
+  .legend .item { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 3px; }
+  .legend .v { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  /* Big number cards */
+  .big {
+    text-align: center; padding: 20px 14px 14px;
+  }
+  .big .v { font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -1px; }
+  .big .v.warn { color: var(--c-orange); }
+  .big .v.good { color: var(--c-green); }
+  .big .v.bad { color: var(--c-red); }
+  .big .l { color: var(--muted); margin-top: 6px; font-size: 12px; }
+
+  /* Callouts */
+  .callout {
+    border-radius: 14px; padding: 18px 20px; line-height: 1.55;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+  }
+  .callout.warn { background: linear-gradient(180deg, #2a1a16 0%, #1d1310 100%); border: 1px solid var(--warn-border); color: var(--warn-text); }
+  .callout.good { background: linear-gradient(180deg, #122a1d 0%, #0d1f17 100%); border: 1px solid var(--good-border); color: var(--good-text); }
+  .callout.info { background: linear-gradient(180deg, #16203a 0%, #11182a 100%); border: 1px solid var(--info-border); color: var(--info-text); }
+  .callout h4 {
+    margin: 0 0 8px; font-size: 14px; letter-spacing: 0.4px;
+    text-transform: uppercase; display: flex; align-items: center; gap: 8px;
+  }
+  .callout h4::before {
+    content: "▲"; font-size: 11px; opacity: 0.85;
+  }
+  .callout.good h4::before { content: "✓"; }
+  .callout.info h4::before { content: "i"; font-style: italic; font-weight: 700; }
+  .callout p { margin: 6px 0 0; font-size: 13px; color: var(--text); }
+  .callout p.lede { color: inherit; font-weight: 600; font-size: 14px; }
+  .callout ul { margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: var(--text); }
+  .callout ul li { margin: 4px 0; }
+
+  /* Footer */
+  .footer {
+    margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);
+    color: var(--muted2); font-size: 11px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .footer .right { text-align: right; }
+
+  /* Note pill */
+  .pill {
+    display: inline-block; padding: 3px 9px; border-radius: 999px;
+    font-size: 10.5px; letter-spacing: 0.4px; text-transform: uppercase;
+    background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border);
+  }
+  .pill.warn { background: rgba(255,138,115,0.1); color: var(--warn-text); border-color: rgba(192,57,43,0.5); }
+  .pill.good { background: rgba(111,224,164,0.1); color: var(--good-text); border-color: rgba(30,138,85,0.5); }
+
+  .grid-tight { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-mini {
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    background: rgba(255,255,255,0.02);
+  }
+  .stat-mini .v { font-size: 22px; font-weight: 700; line-height: 1; }
+  .stat-mini .l { color: var(--muted); font-size: 11px; margin-top: 4px; }
+  .stat-mini.cyan .v { color: var(--c-cyan); }
+  .stat-mini.green .v { color: var(--c-green); }
+  .stat-mini.orange .v { color: var(--c-orange); }
+  .stat-mini.violet .v { color: var(--c-violet); }
+  .stat-mini.red .v { color: var(--c-red); }
+
+  ul.crisp { margin: 8px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--text); line-height: 1.55; }
+  ul.crisp li { margin: 5px 0; }
+  ul.crisp li b { color: #fff; }
+  ul.crisp li .m { color: var(--muted); font-size: 11px; }
+
+  @media (max-width: 1100px) {
+    .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9 { grid-column: span 12; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="title">
+    <h1>Pesquisa Internato EMED 2026 — Análise Crítica</h1>
+    <div class="sub">
+      <b>92 respostas válidas</b> · versão atualizada (V2) coletada de 06–09/abr/2026 ·
+      <span class="pill warn">22 respostas V1 antiga separadas (formulário diferente)</span>
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi k1"><div class="num">92</div><div class="lbl">Respostas válidas</div></div>
+    <div class="kpi k2"><div class="num">92%</div><div class="lbl">Sentem-se inseguros</div></div>
+    <div class="kpi k3"><div class="num">73%</div><div class="lbl">Dor: urgência/PCR</div></div>
+    <div class="kpi k4"><div class="num">42%</div><div class="lbl">Querem 1–2m antes</div></div>
+  </div>
+</div>
+
+<!-- ROW 1: Preparo | Fase | Dificuldades (wide) -->
+<div class="grid">
+
+  <div class="card col-3">
+    <h3>Nível de preparo inicial</h3>
+    <div class="bars">
+      <div class="bar-row compact"><div class="label small">Pouco preparado</div><div class="track"><div class="fill c-red" style="width:96%"></div></div><div class="pct">45% <span class="n">(41)</span></div></div>
+      <div class="bar-row compact"><div class="label small">Parcialmente preparado</div><div class="track"><div class="fill c-orange" style="width:96%"></div></div><div class="pct">45% <span class="n">(41)</span></div></div>
+      <div class="bar-row compact"><div class="label small">Totalmente inseguro</div><div class="track"><div class="fill c-amber" style="width:18%"></div></div><div class="pct">9% <span class="n">(8)</span></div></div>
+      <div class="bar-row compact"><div class="label small">Muito preparado</div><div class="track"><div class="fill c-green" style="width:5%"></div></div><div class="pct">2% <span class="n">(2)</span></div></div>
+    </div>
+    <div class="insight"><b>92% sentem-se inseguros.</b> Apenas 2 de 92 (2%) se dizem "muito preparados". A dor é praticamente universal nessa base.</div>
+  </div>
+
+  <div class="card col-3">
+    <h3>Fase da graduação</h3>
+    <div class="bars">
+      <div class="bar-row compact"><div class="label small">5º ano</div><div class="track"><div class="fill c-violet" style="width:100%"></div></div><div class="pct">42% <span class="n">(39)</span></div></div>
+      <div class="bar-row compact"><div class="label small">4º ano</div><div class="track"><div class="fill c-indigo" style="width:74%"></div></div><div class="pct">32% <span class="n">(29)</span></div></div>
+      <div class="bar-row compact"><div class="label small">3º ano</div><div class="track"><div class="fill c-blue" style="width:26%"></div></div><div class="pct">11% <span class="n">(10)</span></div></div>
+      <div class="bar-row compact"><div class="label small">6º ano</div><div class="track"><div class="fill c-cyan" style="width:26%"></div></div><div class="pct">11% <span class="n">(10)</span></div></div>
+      <div class="bar-row compact"><div class="label small">2º ano</div><div class="track"><div class="fill c-teal" style="width:5%"></div></div><div class="pct">2% <span class="n">(2)</span></div></div>
+      <div class="bar-row compact"><div class="label small">Já formado</div><div class="track"><div class="fill c-green" style="width:5%"></div></div><div class="pct">2% <span class="n">(2)</span></div></div>
+    </div>
+    <div class="insight"><b>74% são 4º + 5º ano</b> — exatamente o público que está a 1–2 semestres do internato. Janela de venda alinhada.</div>
+  </div>
+
+  <div class="card col-6">
+    <h3>Maiores dificuldades para o internato (até 3) — n=92</h3>
+    <div class="bars">
+      <div class="bar-row tight"><div class="label">Urgência / PCR / instabilidade</div><div class="track"><div class="fill c-red" style="width:100%"></div></div><div class="pct">73% <span class="n">(67)</span></div></div>
+      <div class="bar-row tight"><div class="label">Interpretar ECG</div><div class="track"><div class="fill c-orange" style="width:79%"></div></div><div class="pct">58% <span class="n">(53)</span></div></div>
+      <div class="bar-row tight"><div class="label">Prescrição médica completa</div><div class="track"><div class="fill c-amber" style="width:73%"></div></div><div class="pct">53% <span class="n">(49)</span></div></div>
+      <div class="bar-row tight"><div class="label">Evoluir paciente corretamente</div><div class="track"><div class="fill c-yellow" style="width:37%"></div></div><div class="pct">27% <span class="n">(25)</span></div></div>
+      <div class="bar-row tight"><div class="label">Suturar / drenar abscesso</div><div class="track"><div class="fill c-lime" style="width:27%"></div></div><div class="pct">20% <span class="n">(18)</span></div></div>
+      <div class="bar-row tight"><div class="label">Interpretação de exames laboratoriais</div><div class="track"><div class="fill c-green" style="width:24%"></div></div><div class="pct">17% <span class="n">(16)</span></div></div>
+      <div class="bar-row tight"><div class="label">Realizar exame físico</div><div class="track"><div class="fill c-teal" style="width:22%"></div></div><div class="pct">16% <span class="n">(15)</span></div></div>
+      <div class="bar-row tight"><div class="label">Passar plantão organizado</div><div class="track"><div class="fill c-cyan" style="width:16%"></div></div><div class="pct">12% <span class="n">(11)</span></div></div>
+      <div class="bar-row tight"><div class="label">Exame ginecológico</div><div class="track"><div class="fill c-blue" style="width:13%"></div></div><div class="pct">10% <span class="n">(9)</span></div></div>
+      <div class="bar-row tight"><div class="label">Exame obstétrico</div><div class="track"><div class="fill c-indigo" style="width:9%"></div></div><div class="pct">7% <span class="n">(6)</span></div></div>
+    </div>
+    <div class="insight"><b>Núcleo "Urgência + ECG + Prescrição"</b> aparece em quase todo respondente — eixo natural do MVP. <span class="pill warn">Recalculado: dado original tinha bug de parsing (rótulos com vírgula interna duplicavam contagens)</span></div>
+  </div>
+
+</div>
+
+<div style="height:14px"></div>
+
+<!-- ROW 2: Valoriza | Formato | Momento -->
+<div class="grid">
+
+  <div class="card col-4">
+    <h3>O que mais valoriza num curso prático (até 2)</h3>
+    <div class="bars">
+      <div class="bar-row tight"><div class="label">Casos clínicos reais</div><div class="track"><div class="fill c-violet" style="width:100%"></div></div><div class="pct">50% <span class="n">(46)</span></div></div>
+      <div class="bar-row tight"><div class="label">Simulação com atores</div><div class="track"><div class="fill c-indigo" style="width:93%"></div></div><div class="pct">47% <span class="n">(43)</span></div></div>
+      <div class="bar-row tight"><div class="label">Fluxogramas / checklists</div><div class="track"><div class="fill c-blue" style="width:83%"></div></div><div class="pct">41% <span class="n">(38)</span></div></div>
+      <div class="bar-row tight"><div class="label">Manequins / simuladores</div><div class="track"><div class="fill c-cyan" style="width:67%"></div></div><div class="pct">34% <span class="n">(31)</span></div></div>
+      <div class="bar-row tight"><div class="label">Material biológico</div><div class="track"><div class="fill c-teal" style="width:46%"></div></div><div class="pct">23% <span class="n">(21)</span></div></div>
+    </div>
+    <div class="insight"><b>Pergunta saturou:</b> 5 opções com "marque 2" deu distribuição quase plana. Sinal: TODO formato hands-on é valorizado, não há discriminação útil para cortar conteúdo.</div>
+  </div>
+
+  <div class="card col-4">
+    <h3>Formato presencial preferido</h3>
+    <div class="bars">
+      <div class="bar-row tight"><div class="label">2 dias (FDS completo)</div><div class="track"><div class="fill c-green" style="width:100%"></div></div><div class="pct">25% <span class="n">(23)</span></div></div>
+      <div class="bar-row tight"><div class="label">Modular (vários sábados)</div><div class="track"><div class="fill c-teal" style="width:83%"></div></div><div class="pct">21% <span class="n">(19)</span></div></div>
+      <div class="bar-row tight"><div class="label">Sem interesse em presencial</div><div class="track"><div class="fill c-red" style="width:78%"></div></div><div class="pct">20% <span class="n">(18)</span></div></div>
+      <div class="bar-row tight"><div class="label">Híbrido (online + 1 dia)</div><div class="track"><div class="fill c-cyan" style="width:74%"></div></div><div class="pct">18% <span class="n">(17)</span></div></div>
+      <div class="bar-row tight"><div class="label">1 dia intensivo (8–10h)</div><div class="track"><div class="fill c-blue" style="width:65%"></div></div><div class="pct">16% <span class="n">(15)</span></div></div>
+    </div>
+    <div class="insight"><b>Sem vencedor único.</b> "FDS inteiro + 1 dia intensivo" = 41% (formato curto e concentrado domina). Modular existe (21%) mas é 2º lugar — atenção: modular afasta interiorano que vai a SP por 1 dia mas não por 4.</div>
+  </div>
+
+  <div class="card col-4">
+    <h3>Melhor momento para o curso</h3>
+    <div class="bars">
+      <div class="bar-row tight"><div class="label">1–2 meses antes do internato</div><div class="track"><div class="fill c-orange" style="width:100%"></div></div><div class="pct">42% <span class="n">(39)</span></div></div>
+      <div class="bar-row tight"><div class="label">Durante o internato</div><div class="track"><div class="fill c-amber" style="width:64%"></div></div><div class="pct">27% <span class="n">(25)</span></div></div>
+      <div class="bar-row tight"><div class="label">Tanto faz</div><div class="track"><div class="fill c-yellow" style="width:38%"></div></div><div class="pct">16% <span class="n">(15)</span></div></div>
+      <div class="bar-row tight"><div class="label">Na semana anterior</div><div class="track"><div class="fill c-lime" style="width:33%"></div></div><div class="pct">14% <span class="n">(13)</span></div></div>
+    </div>
+    <div class="insight"><b>56% querem ANTES</b> do internato. A janela de venda é o trimestre que antecede a data oficial de início.</div>
+  </div>
+
+</div>
+
+<div style="height:14px"></div>
+
+<!-- ROW 3: Curso completo | Período | Cidade -->
+<div class="grid">
+
+  <div class="card col-4">
+    <h3>Curso completo ou modular?</h3>
+    <div class="bars">
+      <div class="bar-row tight"><div class="label">Cursos separados por habilidade</div><div class="track"><div class="fill c-blue" style="width:100%"></div></div><div class="pct">46% <span class="n">(42)</span></div></div>
+      <div class="bar-row tight"><div class="label">"Os dois" (canibaliza)</div><div class="track"><div class="fill c-indigo" style="width:86%"></div></div><div class="pct">39% <span class="n">(36)</span></div></div>
+      <div class="bar-row tight"><div class="label">Curso completo (1 dia)</div><div class="track"><div class="fill c-violet" style="width:33%"></div></div><div class="pct">15% <span class="n">(14)</span></div></div>
+    </div>
+    <div class="insight"><span class="pill warn">Atenção</span> A opção "os dois" (39%) mata o sinal — é resposta de menor compromisso. <b>Forçando binária: separados (75%) vs completo (25%).</b> Conclusão honesta: o público quer cursos por habilidade, não um pacotão de 1 dia.</div>
+  </div>
+
+  <div class="card col-4">
+    <h3>Período da semana preferido</h3>
+    <div class="bars">
+      <div class="bar-row tight"><div class="label">Fim de semana inteiro</div><div class="track"><div class="fill c-green" style="width:100%"></div></div><div class="pct">50% <span class="n">(46)</span></div></div>
+      <div class="bar-row tight"><div class="label">Sábado</div><div class="track"><div class="fill c-teal" style="width:76%"></div></div><div class="pct">38% <span class="n">(35)</span></div></div>
+      <div class="bar-row tight"><div class="label">Domingo</div><div class="track"><div class="fill c-cyan" style="width:11%"></div></div><div class="pct">5% <span class="n">(5)</span></div></div>
+      <div class="bar-row tight"><div class="label">Durante a semana</div><div class="track"><div class="fill c-blue" style="width:11%"></div></div><div class="pct">5% <span class="n">(5)</span></div></div>
+      <div class="bar-row tight"><div class="label">Sexta-feira</div><div class="track"><div class="fill c-indigo" style="width:2%"></div></div><div class="pct">1% <span class="n">(1)</span></div></div>
+    </div>
+    <div class="insight"><b>88% no FDS</b> (sábado + FDS inteiro). Decisão operacional clara: FDS é o slot.</div>
+  </div>
+
+  <div class="card col-4">
+    <h3>Aceitação geográfica</h3>
+    <div class="donut-wrap">
+      <div class="donut">
+        <svg viewBox="0 0 42 42">
+          <circle cx="21" cy="21" r="15.915" fill="none" stroke="#1a2236" stroke-width="6"/>
+          <!-- 40% só online (cyan), 39% só presencial (green), 20% ambos (violet) -->
+          <circle cx="21" cy="21" r="15.915" fill="none" stroke="#38bdf8" stroke-width="6"
+                  stroke-dasharray="40 60" stroke-dashoffset="0"/>
+          <circle cx="21" cy="21" r="15.915" fill="none" stroke="#4dd28c" stroke-width="6"
+                  stroke-dasharray="39 61" stroke-dashoffset="-40"/>
+          <circle cx="21" cy="21" r="15.915" fill="none" stroke="#a855f7" stroke-width="6"
+                  stroke-dasharray="20 80" stroke-dashoffset="-79"/>
+        </svg>
+        <div class="center"><div class="n">59%</div><div class="l">presencial-elegível</div></div>
+      </div>
+      <div class="legend">
+        <div class="item"><div class="dot" style="background:#4dd28c"></div><div>Só presencial</div><div class="v">39% (36)</div></div>
+        <div class="item"><div class="dot" style="background:#a855f7"></div><div>Online + presencial</div><div class="v">20% (18)</div></div>
+        <div class="item"><div class="dot" style="background:#38bdf8"></div><div>Só online</div><div class="v">40% (37)</div></div>
+      </div>
+    </div>
+    <div class="insight">A pergunta de "cidade" embute online — <b>40% só viria se fosse online</b>, fora do escopo de um lançamento presencial. O mercado presencial real é ~54 pessoas (59%).</div>
+  </div>
+
+</div>
+
+<div style="height:14px"></div>
+
+<!-- ROW 4: PRICING ALERT (FULL WIDTH) -->
+<div class="grid">
+  <div class="card col-12" style="border-color: var(--warn-border);">
+    <h3 style="color: var(--warn-text);">Disposição a pagar — atenção metodológica grave</h3>
+    <div style="display:grid; grid-template-columns: 1fr 1.4fr; gap: 18px; align-items: stretch;">
+      <div>
+        <div class="bars">
+          <div class="bar-row tight"><div class="label">R$500 – R$1.000</div><div class="track"><div class="fill c-red" style="width:100%"></div></div><div class="pct">77% <span class="n">(71)</span></div></div>
+          <div class="bar-row tight"><div class="label">R$1.000 – R$1.500</div><div class="track"><div class="fill c-orange" style="width:15%"></div></div><div class="pct">12% <span class="n">(11)</span></div></div>
+          <div class="bar-row tight"><div class="label">"Investiria mais se valer a pena"</div><div class="track"><div class="fill c-amber" style="width:11%"></div></div><div class="pct">9% <span class="n">(8)</span></div></div>
+          <div class="bar-row tight"><div class="label">R$1.500 – R$2.000</div><div class="track"><div class="fill c-yellow" style="width:3%"></div></div><div class="pct">2% <span class="n">(2)</span></div></div>
+        </div>
+        <div class="insight">Apenas 4 opções foram apresentadas. <b>Não havia "&lt; R$500"</b> nem <b>"não pagaria"</b>. A faixa mais baixa tem o dobro de largura das demais.</div>
+      </div>
+      <div class="callout warn">
+        <h4>Esses 77% NÃO validam R$997 — Wallace está 100% certo</h4>
+        <p class="lede">A faixa R$500–1.000 acumula 4 populações diferentes (quem pagaria R$300, R$500, R$700 ou R$950) num único bucket porque não havia onde marcar abaixo.</p>
+        <ul>
+          <li><b>Sem floor:</b> ninguém pôde marcar &lt;R$500, então quem pagaria R$300 marcou R$500–1.000.</li>
+          <li><b>Sem opção zero:</b> os 18 que rejeitaram presencial ainda foram obrigados a marcar uma faixa.</li>
+          <li><b>Largura desigual:</b> a primeira faixa tem R$500 de range — atrai resposta por gravidade da cauda baixa.</li>
+          <li><b>Sem ancoragem:</b> a pergunta menciona "10h" mas não compara com nada (concorrente, EAD, R$/h).</li>
+          <li><b>Conclusão:</b> o dado é compatível tanto com R$997 quanto com R$497. <b>Refazer pricing antes do lançamento</b> com Van Westendorp ou Gabor-Granger leve.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height:14px"></div>
+
+<!-- ROW 5: SP HUB STORY -->
+<div class="grid">
+  <div class="card col-7" style="border-color: var(--good-border);">
+    <h3 style="color: var(--good-text);">São Paulo — única praça com massa crítica + funciona como HUB regional</h3>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+      <div class="grid-tight" style="grid-template-columns: 1fr 1fr;">
+        <div class="stat-mini cyan"><div class="v">26</div><div class="l">aceitam SP (28% dos 92)</div></div>
+        <div class="stat-mini orange"><div class="v">54%</div><div class="l">do público SP topa pagar R$1.000+</div></div>
+        <div class="stat-mini green"><div class="v">+10</div><div class="l">cidades de origem além de SP capital</div></div>
+        <div class="stat-mini violet"><div class="v">≤3</div><div class="l">menções p/ qualquer outra praça presencial</div></div>
+      </div>
+      <div>
+        <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">Origem dos respondentes que aceitam SP:</div>
+        <ul class="crisp" style="font-size:11.5px; columns: 2; column-gap: 16px;">
+          <li>SP capital + Grande SP <span class="m">(8)</span></li>
+          <li>Sorocaba <span class="m">(2)</span></li>
+          <li>São Carlos <span class="m">(2)</span></li>
+          <li>Campinas, Bauru</li>
+          <li>Caraguatatuba</li>
+          <li>Itapetininga, Jundiaí</li>
+          <li>Brasília, Goiânia</li>
+          <li>Cuiabá, Cascavel</li>
+          <li>Fortaleza, Teresina</li>
+          <li>Mineiros, Montes Claros</li>
+          <li>Uberaba, Ipatinga</li>
+          <li>Araçatuba</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight"><b>Implicação:</b> SP capital captura interior SP + outras UFs num raio amplo. Para qualquer outra praça (BH, Recife, POA, Manaus etc.) a amostra atual não tem volume — exigiria pesquisa dirigida ou pré-venda regional para validar.</div>
+  </div>
+
+  <div class="card col-5">
+    <h3>SP × Disposição a pagar (n=26)</h3>
+    <div class="bars">
+      <div class="bar-row tight"><div class="label">R$500 – R$1.000</div><div class="track"><div class="fill c-blue" style="width:71%"></div></div><div class="pct">46% <span class="n">(12)</span></div></div>
+      <div class="bar-row tight"><div class="label">R$1.000 – R$1.500</div><div class="track"><div class="fill c-indigo" style="width:42%"></div></div><div class="pct">27% <span class="n">(7)</span></div></div>
+      <div class="bar-row tight"><div class="label">"Investiria mais"</div><div class="track"><div class="fill c-violet" style="width:42%"></div></div><div class="pct">27% <span class="n">(7)</span></div></div>
+      <div class="bar-row tight"><div class="label">R$1.500 – R$2.000</div><div class="track"><div class="fill c-pink" style="width:0%"></div></div><div class="pct">0% <span class="n">(0)</span></div></div>
+    </div>
+    <div class="insight"><b>54% do público SP toparia R$1.000+</b>, contra 22% no agregado da pesquisa. A direção é forte (apesar de n=26): o público que aceita se deslocar para SP é mais alto-ticket. Reforça SP como praça-1 + abre espaço para teste de pricing acima de R$997 nesse segmento.</div>
+  </div>
+</div>
+
+<div style="height:14px"></div>
+
+<!-- ROW 6: Open fields / future courses + V3 -->
+<div class="grid">
+  <div class="card col-6">
+    <h3>Roadmap futuro — sinais dos campos abertos</h3>
+    <p style="margin:0 0 8px; font-size:12.5px; color:var(--muted);">Categorias que NÃO estavam na grade fechada e apareceram organicamente — demanda latente para próximos cursos:</p>
+    <ul class="crisp">
+      <li><b>Procedimentos avançados</b> — intubação, ventilação mecânica, acesso venoso central (citado 2x), toracocentese, dreno de tórax. <span class="m">categoria inteira fora da pergunta original — o dado fechado SUBESTIMA essa demanda</span></li>
+      <li><b>Antibioticoterapia</b> <span class="m">— citação enfática</span></li>
+      <li><b>UTI / paciente crítico</b></li>
+      <li><b>Urgência pediátrica</b> <span class="m">— subnicho do tema #1, com público dedicado</span></li>
+      <li><b>Raciocínio clínico</b> <span class="m">— tema "soft" mas pedido</span></li>
+      <li><b>Comunicação interconsulta</b> <span class="m">— "como o generalista deve dialogar com as demais especialidades"</span></li>
+    </ul>
+    <div class="insight"><b>3 menções espontâneas</b> sobre tensão de pricing entre clientes atuais: "é caro pagar valor por fora", "mini cursos para quem já paga o extensivo", "bolsa 100% baixa renda". <b>A pesquisa não pergunta se o respondente já é aluno do EMED</b> — variável crítica omitida que muda o pricing por segmento.</div>
+  </div>
+
+  <div class="card col-6">
+    <h3>Avisos metodológicos & roadmap V3</h3>
+    <div class="callout info" style="margin-bottom:10px;">
+      <h4>O que esse dado NÃO permite decidir</h4>
+      <ul>
+        <li><b>Pricing.</b> A faixa R$500–1.000 modal é artefato da escala (ver alerta acima).</li>
+        <li><b>Completo vs separado.</b> "Os dois" (39%) canibaliza a binária.</li>
+        <li><b>Mapa de praças além de SP.</b> Campo aberto + viés online não permite escolher 2ª e 3ª cidade com segurança.</li>
+        <li><b>Tamanho de mercado.</b> Sample autoselecionada = lead já engajado, não universo.</li>
+        <li><b>Concorrência.</b> Não foi perguntado.</li>
+      </ul>
+    </div>
+    <div class="callout good">
+      <h4>O que rodar numa V3 antes de fechar lançamento</h4>
+      <ul>
+        <li>Pergunta inicial "é cliente do extensivo?" — segmenta pricing.</li>
+        <li>Cidade fechada (12–15 praças + "só online" mutuamente exclusivas).</li>
+        <li>Pricing limpo: 7 faixas equiespaçadas + opção "não pagaria" + intenção declarada com âncora aleatorizada (R$697 / R$997 / R$1.297).</li>
+        <li>Dificuldades como ranking 1–2–3 (não marca-livre) + procedimentos avançados nas opções.</li>
+        <li>n alvo ≥ 250 com 2 ondas em dias diferentes.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>
+    <b style="color:var(--text)">Fonte:</b> Pesquisa "[EMED] Pesquisa Internato 2026 (atualizada)" — 92 respostas válidas da V2 (06–09/abr/2026).
+    <span class="pill warn" style="margin-left:8px">22 respostas da V1 antiga separadas — formulário tinha menos perguntas</span>
+  </div>
+  <div class="right">
+    Análise: Coruja Vision Hub  ·  Recalculado a partir do dado bruto<br>
+    Dificuldades corrigidas (parsing por keyword) · Cortes de SP recomputados
+  </div>
+</div>
+
+</div>
+</body>
+</html>
